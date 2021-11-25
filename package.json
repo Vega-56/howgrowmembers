@@ -12,5 +12,5 @@
 		"exceljs": "^4.3.0",
 		"puppeteer": "^11.0.0"
 	},
-	"type": "module"
+	"type": "commonjs"
 }
