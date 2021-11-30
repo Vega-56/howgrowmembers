@@ -1,5 +1,6 @@
 "use strict";
 const puppeteer = require("puppeteer");
+const membersExcel = require("./members-excel");
 
 module.exports = {
 	run: async () => {
@@ -38,12 +39,12 @@ module.exports = {
 
 		sleep(4000);
 
-		const addToArray = async (array, memberList) => {
-			const members = await memberList;
-			for (let i = 0; i < 100; i++) {
-				array.push(members[i]);
-			}
-		};
+		// const addToArray = async (array, memberList) => {
+		// 	const members = await memberList;
+		// 	for (let i = 0; i < 100; i++) {
+		// 		array.push(members[i]);
+		// 	}
+		// };
 
 		// // Grab current members on page 1;
 		// const memberList = await page.evaluate(() =>
@@ -54,95 +55,71 @@ module.exports = {
 		// );
 
 		const loopThruPages = async () => {
+			// Grabs members
+			const getMembers = async () => {
+				const members = await page.evaluate(() =>
+					Array.from(
+						document.querySelectorAll(".nick"),
+						(element) => element.textContent
+					)
+				);
+				return members;
+			};
+
 			// Array of all members;
 			const allMembers = [];
 
-			// const firstMembers = await page.evaluate(() =>
-			// 	Array.from(
-			// 		document.querySelectorAll(".nick"),
-			// 		(element) => element.textContent
-			// 	)
-			// );
-			// // Pushes the members from page one
-			// addToArray(allMembers, firstMembers);
+			// grab all buttons
+			const btns = await page.$x('//*[@id="paginate"]/child::*');
 
-			// // get buttons of first page
-			// const firstBtns = await page.$x('//*[@id="paginate"]/child::*');
+			// grab all memebrs
+			const memberList = await page.evaluate(() =>
+				Array.from(
+					document.querySelectorAll(".nick"),
+					(element) => element.textContent
+				)
+			);
+
+			// grab members and then push into arr
+			allMembers.push(memberList);
+
+			// this works
+			// await btns[1].click();
 			// sleep(4000);
+			const btnsCount = await btns.length;
 
-			// // Need to change for loop for something else
-			// // for (let i = 1; i <= 11; i++) {
-			// // 	// grab current members in list
+			// for (let i = 1; i <= btnsCount; i++) {
+			// 	const members = await getMembers();
+			// 	allMembers.push(members);
 
-			// // 	const currentMembers = await page.evaluate(() =>
-			// // 		Array.from(
-			// // 			document.querySelectorAll(".nick"),
-			// // 			(element) => element.textContent
-			// // 		)
-			// // 	);
-			// // 	// push current members into allMembers arr
-			// // 	addToArray(allMembers, currentMembers);
+			// await btns[i].click();
+			// 	sleep(4000);
+			// }
 
-			// // 	// then press next button
-			// // 	await firstBtns[i].click();
+			// const btnsAgain = await page.$x(`//*[@id="paginate"]/a[${2}]`);
 
-			// // 	// pause to allow page to load members
-			// // 	sleep(4000);
-			// // }
+			// await btnsAgain[0].click();
 
-			// Promise.all(
-			// 				firstBtns.map((button, index) => {
-			// 					if (index === 0) {
-			// 						return;
-			// 					}
+			// sleep(4000);
+			// const x = await getMembers();
 
-			// 					addToArray(allMembers, memberList);
+			// allMembers.push(x);
+			let i = 0;
+			for (const item of btns) {
+				if (i === 0) {
+					console.log("hi");
+				} else {
+					const btnsAgain = await page.$x(`//*[@id="paginate"]/a[${i + 1}]`);
 
-			// 					// This needs to be made await / async ;;
-			// 					button.click();
+					await btnsAgain[0].click();
+					sleep(4000);
 
-			// 					sleep(4000);
-			// 				})
-			// 			);
-			// Loop thru pages after first set of 10
-
-			for (let i = 1; i <= 1; i++) {
-				const btns = await page.$x('//*[@id="paginate"]/child::*');
-
-				const grabPageMembers = async () => {
-					// Grab current items
-					const memberList = await page.evaluate(() =>
-						Array.from(
-							document.querySelectorAll(".nick"),
-							(element) => element.textContent
-						)
-					);
-								
-					return Promise.all(
-						btns.map((button, index) => {
-							if (index <= 1) {
-								return;
-							}
-
-							// grab all the members
-							// push the members into the Allmembers Arr
-							// then we click to next page
-							// memberList();
-
-							addToArray(allMembers, memberList);
-
-							// This needs to be made await / async ;;
-							button.click();
-
-							sleep(4000);
-						})
-					);
-				};
-				console.log("1 done");
-				const grab = await grabPageMembers();
-				grab;
-				return allMembers;
+					const members = await getMembers();
+					allMembers.push(members);
+				}
+				i++;
 			}
+			return allMembers;
 		};
 		sleep(4000);
 		const allPages = await loopThruPages();
