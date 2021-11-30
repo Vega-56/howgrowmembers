@@ -104,6 +104,8 @@ module.exports = {
 			// const x = await getMembers();
 
 			// allMembers.push(x);
+
+			// this is for first 10 pages
 			let i = 0;
 			for (const item of btns) {
 				if (i === 0) {
@@ -119,6 +121,30 @@ module.exports = {
 				}
 				i++;
 			}
+
+			// Need to change "of btns"
+			// because btns is an array of 11 buttons (from first page)
+			// Instead should grab buttons with function again to get array of 12 items
+
+			// this is for pages after first 10
+			for (let j = 0; j < 1; j++) {
+				let k = 0;
+				for (const item of btns) {
+					if (k <= 1) {
+						console.log("Yo");
+					} else {
+						const btnsAgain = await page.$x(`//*[@id="paginate"]/a[${k + 1}]`);
+
+						await btnsAgain[0].click();
+						sleep(4000);
+
+						const members = await getMembers();
+						allMembers.push(members);
+					}
+					k++;
+				}
+			}
+
 			return allMembers;
 		};
 		sleep(4000);
