@@ -1,6 +1,5 @@
 "use strict";
 const puppeteer = require("puppeteer");
-const membersExcel = require("./members-excel");
 
 module.exports = {
 	run: async () => {
