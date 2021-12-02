@@ -68,7 +68,7 @@ module.exports = {
 			// Array of all members;
 			const allMembers = [];
 
-			// grab all buttons
+			// grab all buttons (11 buttons)
 			const btns = await page.$x('//*[@id="paginate"]/child::*');
 
 			// grab all memebrs
@@ -126,9 +126,12 @@ module.exports = {
 			// Instead should grab buttons with function again to get array of 12 items
 
 			// this is for pages after first 10
-			for (let j = 0; j < 1; j++) {
+			for (let j = 0; j < 7; j++) {
 				let k = 0;
-				for (const item of btns) {
+
+				const moreBtns = await page.$x('//*[@id="paginate"]/child::*');
+				sleep(2000);
+				for (const item of moreBtns) {
 					if (k <= 1) {
 						console.log("Yo");
 					} else {
