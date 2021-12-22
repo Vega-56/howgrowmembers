@@ -18,12 +18,12 @@ module.exports = {
 		membersSheet.getRow(1).font = { bold: true };
 		return membersSheet;
 	},
-	
+
 	insertMemberData: function (memberData, worksheet) {
 		const formatData = (memberArr) => {
 			return memberArr.map((item) => item.split(" ("));
 		};
-
+			
 		formatData(memberData).forEach((member) => {
 			worksheet.addRow(member);
 		});
@@ -36,4 +36,3 @@ module.exports = {
 		this.writeToFile(this.workbook);
 	},
 };
-

@@ -1,5 +1,16 @@
 "use strict";
 const puppeteer = require("puppeteer");
+const readline = require("readline");
+const rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout,
+});
+
+const inputPrompt = async (queryText) => {
+	return new Promise((resolve) => {
+		return rl.question(queryText, resolve);
+	});
+};
 
 module.exports = {
 	run: async () => {
@@ -18,9 +29,13 @@ module.exports = {
 		sleep(3000);
 
 		await page.click("#id");
-		await page.type("#id", "instarocket", { delay: 100 });
+
+		const id = await inputPrompt("Enter your username/id: ");
+		const pw = await inputPrompt("Enter your password: ");
+		await page.type("#id", id, { delay: 100 });
+
 		await page.click("#pw");
-		await page.type("#pw", "howgrow!!@@11", { delay: 110 });
+		await page.type("#pw", pw, { delay: 110 });
 
 		// This screenshot shows that the login details went in ok
 		await page.screenshot({ path: "login.png" });
@@ -30,7 +45,7 @@ module.exports = {
 
 		// slight pause
 		sleep(4000);
-
+		
 		// This is to confirm that we are successfully inside the site (no login issues)
 		await page.screenshot({ path: "loginpassed.png" });
 
@@ -82,33 +97,10 @@ module.exports = {
 			// grab members and then push into arr
 			allMembers.push(memberList);
 
-			// this works
-			// await btns[1].click();
-			// sleep(4000);
-			const btnsCount = await btns.length;
-
-			// for (let i = 1; i <= btnsCount; i++) {
-			// 	const members = await getMembers();
-			// 	allMembers.push(members);
-
-			// await btns[i].click();
-			// 	sleep(4000);
-			// }
-
-			// const btnsAgain = await page.$x(`//*[@id="paginate"]/a[${2}]`);
-
-			// await btnsAgain[0].click();
-
-			// sleep(4000);
-			// const x = await getMembers();
-
-			// allMembers.push(x);
-
 			// this is for first 10 pages
 			let i = 0;
 			for (const item of btns) {
 				if (i === 0) {
-					console.log("hi");
 				} else {
 					const btnsAgain = await page.$x(`//*[@id="paginate"]/a[${i + 1}]`);
 
@@ -131,6 +123,7 @@ module.exports = {
 
 				const moreBtns = await page.$x('//*[@id="paginate"]/child::*');
 				sleep(2000);
+
 				for (const item of moreBtns) {
 					if (k <= 1) {
 						console.log("Yo");
@@ -149,6 +142,7 @@ module.exports = {
 
 			return allMembers;
 		};
+
 		sleep(4000);
 		const allPages = await loopThruPages();
 
@@ -156,9 +150,6 @@ module.exports = {
 
 		console.log(await flattened);
 
-		// closes too early (error code 'Target closed') need to delay somehow?
-		// Apparently might be due to not all page methods being awaited)
-		// Due to in a .map(), might need to reformat
 		await browser.close();
 
 		return flattened;
